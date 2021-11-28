@@ -2,10 +2,9 @@ import pandas as pd
 
 column_names = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
 
-df = pd.read_csv("access_log_Aug95.txt", delimiter=' ', names=column_names, encoding='unicode_escape')
+df = pd.read_csv("MergedLogs.txt", delimiter=' ', names=column_names, encoding='unicode_escape')
 
 errors1 = df[df['9'].notnull()]
-
 df = df[df['9'].isnull()]
 
 
@@ -19,7 +18,6 @@ df = df[['Host/IP', 'Timestamp', 'Request Type', 'Path', 'Response', 'Bytes']]
 
 # Wrangling errors1
 errors2 = errors1[errors1['10'].notnull()]
-
 errors1 = errors1[errors1['10'].isnull()]
 
 errors1[['14', '15']] = errors1['6'].str.split(' ', 1, expand=True)
@@ -37,12 +35,11 @@ errors2.drop(columns=['2', '3', '5', '6', '7', '8', '9', '12', '13'], inplace=Tr
 errors2.rename(columns={'1': 'Host/IP', '4': 'Timestamp', '14': 'Request Type', '15': 'Path', '10': 'Response', '11': 'Bytes'}, inplace=True)
 errors2 = errors2[['Host/IP', 'Timestamp', 'Request Type', 'Path', 'Response', 'Bytes']]
 
+
+#Merge into DF
 wrangledDF = pd.concat([df, errors1, errors2])
-
 wrangledDF['Timestamp'] = wrangledDF['Timestamp'].str.replace('[', '')
-
 wrangledDF['Domain'] = [x.rsplit(".", 1)[-1] for x in wrangledDF['Host/IP']]
-
 wrangledDF.to_csv('wrangledDF.csv', index=False)
 
 
